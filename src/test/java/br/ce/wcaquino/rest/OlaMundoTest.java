@@ -56,9 +56,22 @@ public class OlaMundoTest {
         assertThat(impares, hasItem(1));
         assertThat(impares, hasItems(1,5));
 
-        assertThat("Maria", is(not("João")));
+        assertThat("Henrique", is(not("João")));
         assertThat("Maria", not("João"));
         assertThat("Joaquina", anyOf(is("Maria"), is("Joaquina")));
         assertThat("Joaquina", allOf(startsWith("Joa"), endsWith("ina"), containsString("qui")));
     }
+
+    @Test
+    public void devoTestarOBody() {
+        given()
+        .when()
+                .get("https://restapi.wcaquino.me/ola")
+        .then()
+                .statusCode(200)
+                .body(is("Ola Mundo!"))
+                .body(containsString("Mundo"))
+                .body(is(notNullValue()));
+    }
+
 }

@@ -16,13 +16,13 @@ public class UserJsonTest {
     public void deveVerificarPrimeiroNivel() {
 
         given()
-       .when()
-            .get("https://restapi.wcaquino.me/users/1")
-       .then()
-            .statusCode(200)
-            .body("id", is(1))
-            .body("name", containsString("Silva"))
-            .body("age", greaterThan(18))
+        .when()
+                .get("https://restapi.wcaquino.me/users/1")
+        .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("name", containsString("Silva"))
+                .body("age", greaterThan(18))
         ;
     }
 
@@ -32,7 +32,7 @@ public class UserJsonTest {
 
         //path
         Assert.assertEquals(new Integer(1), response.path("id"));
-        Assert.assertEquals(new Integer(1), response.path("%s","id")); // %s enviando uma string
+        Assert.assertEquals(new Integer(1), response.path("%s", "id")); // %s enviando uma string
 
         //jsonPath
         JsonPath jpath = new JsonPath(response.asString());
@@ -41,5 +41,35 @@ public class UserJsonTest {
         //from
         int id = JsonPath.from(response.asString()).getInt("id");
         Assert.assertEquals(1, id);
+    }
+
+    @Test
+    public void deveVerificarSegundaNivel() {
+        given()
+        .when()
+                .get("https://restapi.wcaquino.me/users/2")
+        .then()
+                .statusCode(200)
+                .body("name", containsString("Joaquina"))
+                .body("endereco.rua", is("Rua dos bobos"))
+        ;
+    }
+
+    @Test
+    public void deveVerificarLista() {
+        given()
+        .when()
+                .get("https://restapi.wcaquino.me/users/3")
+        .then()
+                .statusCode(200)
+                .body("name", containsString("Ana"))
+                .body("age", is(20))
+                .body("filhos[0].name", is("Zezinho"))
+                .body("filhos[1].name", is("Luizinho"))
+                .body("filhos.name", hasSize(2))
+                .body("filhos.name", hasItems("Luizinho", "Zezinho"))
+                .body("filhos.name", hasItem("Zezinho"))
+        ;
+
     }
 }

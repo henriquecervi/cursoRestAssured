@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
@@ -107,7 +108,7 @@ public class UserJsonTest {
                 .body("find{it.age <= 25}.name", is("Maria Joaquina"))
                 .body("findAll{it.name.contains('n')}.name", hasItems("Maria Joaquina", "Ana Júlia"))
                 .body("findAll{it.name.length() > 10}.name", hasItems("João da Silva", "Maria Joaquina"))
-                .body("name.collect{it.toUpperCase()}", hasItem("MARIA JOAQUINA"))
+                .body("name.collect{it.toUpperCase()}", hasItem("MARIA JOAQUINA")) // collect é utilizado para efetuar transformações
                 .body("name.findAll{it.startsWith('Maria')}.collect{it.toUpperCase()}", hasItem("MARIA JOAQUINA"))
                 .body("name.findAll{it.startsWith('Maria')}.collect{it.toUpperCase()}.toArray()", allOf(arrayContaining("MARIA JOAQUINA"), arrayWithSize(1)))
                 .body("age.collect{it * 2}", hasItems(60, 50, 40))
@@ -116,5 +117,20 @@ public class UserJsonTest {
                 .body("salary.findAll{it != null}.sum()", is(closeTo(3734.5678f, 0.001)))
                 .body("salary.findAll{it != null}.sum()", allOf(greaterThan(3000d), lessThan(5000d)))
         ;
+    }
+
+    @Test
+    public void devoUnirJsonPathcomJava() {
+        ArrayList<String> names =
+                given()
+                .when()
+                    .get("https://restapi.wcaquino.me/users")
+                .then()
+                    .statusCode(200)
+                    .extract().path("name.findAll{it.startsWith('Maria')}")
+                ;
+        Assert.assertEquals(1, names.size());
+        Assert.assertTrue(names.get(0).equalsIgnoreCase("mArIa jOaquina"));
+        Assert.assertEquals(names.get(0).toUpperCase(), "maria joaquina".toUpperCase());
     }
 }
